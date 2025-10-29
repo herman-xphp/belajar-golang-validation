@@ -98,15 +98,15 @@ func TestValidationErrors(t *testing.T) {
 
 func TestStructCrossField(t *testing.T) {
 	type RegisterUser struct {
-		Username string `validate:"required,email"`
-		Password string `validate:"required,min=5"`
+		Username        string `validate:"required,email"`
+		Password        string `validate:"required,min=5"`
 		ConfirmPassword string `validate:"required,min=5,eqfield=Password"`
 	}
 
 	validate := validator.New()
 	required := RegisterUser{
-		Username: "budi@example.com",
-		Password: "budi12345",	
+		Username:        "budi@example.com",
+		Password:        "budi12345",
 		ConfirmPassword: "budi12345",
 	}
 
@@ -116,26 +116,59 @@ func TestStructCrossField(t *testing.T) {
 	}
 }
 
-
 func TestNestedStruct(t *testing.T) {
 	type Address struct {
-		City string `validate:"required"`
+		City    string `validate:"required"`
 		Country string `validate:"required"`
 	}
-	
+
 	type User struct {
-		Id string `validate:"required"`
-		Name string `validate:"required"`
+		Id      string  `validate:"required"`
+		Name    string  `validate:"required"`
 		Address Address `validate:"required"`
 	}
 
 	validate := validator.New()
 	request := User{
-		Id: "",
+		Id:   "",
 		Name: "",
 		Address: Address{
-			City: "",
+			City:    "",
 			Country: "",
+		},
+	}
+
+	err := validate.Struct(request)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+}
+
+func TestCollection(t *testing.T) {
+	type Address struct {
+		City    string `validate:"required"`
+		Country string `validate:"required"`
+	}
+
+	type User struct {
+		Id      string    `validate:"required"`
+		Name    string    `validate:"required"`
+		Address []Address `validate:"required,dive"`
+	}
+
+	validate := validator.New()
+	request := User{
+		Id:   "",
+		Name: "",
+		Address: []Address{
+			{
+				City:    "",
+				Country: "",
+			},
+			{
+				City:    "",
+				Country: "",
+			},
 		},
 	}
 
