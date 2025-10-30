@@ -77,8 +77,8 @@ func TestStruct(t *testing.T) {
 
 func TestValidationErrors(t *testing.T) {
 	type LoginRequest struct {
-		Username string `validate:"required,email`
-		Password string `validate:"required,min=5`
+		Username string `validate:"required,email"`
+		Password string `validate:"required,min=5"`
 	}
 
 	validate := validator.New()
@@ -178,7 +178,6 @@ func TestCollection(t *testing.T) {
 	}
 }
 
-
 func TestBasicCollection(t *testing.T) {
 	type Address struct {
 		City    string `validate:"required"`
@@ -189,7 +188,7 @@ func TestBasicCollection(t *testing.T) {
 		Id      string    `validate:"required"`
 		Name    string    `validate:"required"`
 		Address []Address `validate:"required,dive"`
-		Hobbies []string `validate:"dive,required,min=3`
+		Hobbies []string  `validate:"required,dive,required,min=3"`
 	}
 
 	validate := validator.New()
@@ -204,6 +203,70 @@ func TestBasicCollection(t *testing.T) {
 			{
 				City:    "",
 				Country: "",
+			},
+		},
+		Hobbies: []string{
+			"Gaming",
+			"Coding",
+			"Reading",
+			"",
+			"X",
+		},
+	}
+
+	err := validate.Struct(request)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+}
+
+func TestMap(t *testing.T) {
+	type Address struct {
+		City    string `validate:"required"`
+		Country string `validate:"required"`
+	}
+
+	type School struct {
+		Name string `validate:"required"`
+	}
+
+	type User struct {
+		Id      string            `validate:"required"`
+		Name    string            `validate:"required"`
+		Address []Address         `validate:"required,dive"`
+		Hobbies []string          `validate:"dive,required,min=3"`
+		// Schools map[string]School `validate:"dive,keys,required,min=2,endkeys,dive"`
+		Schools map[string]School `validate:"dive,keys,required,min=2,endkeys"`
+	}
+
+	validate := validator.New()
+	request := User{
+		Id:   "",
+		Name: "",
+		Address: []Address{
+			{
+				City:    "",
+				Country: "",
+			},
+			{
+				City:    "",
+				Country: "",
+			},
+		},
+		Hobbies: []string{
+			"Gaming",
+			"Coding",
+			"Reading",
+		},
+		Schools: map[string]School{
+			"SD": {
+				Name: "SD Indonesia",
+			},
+			"SMP": {
+				Name: "",
+			},
+			"": {
+				Name: "",
 			},
 		},
 	}
