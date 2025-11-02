@@ -453,3 +453,38 @@ func TestOrRule(t *testing.T) {
 		fmt.Println(err.Error())
 	}
 }
+
+func MustEqualsIgnoreCase(field validator.FieldLevel) bool {
+	value, _, _, ok := field.GetStructFieldOK2()
+	if !ok {
+		panic("field not ok")
+	}
+
+	firstValue := strings.ToUpper(field.Field().String())
+	secondValue := strings.ToUpper(value.String())
+
+	return firstValue == secondValue
+}
+
+func TestCrossFieldValidation(t *testing.T) {
+	validate := validator.New()
+	validate.RegisterValidation("field_equals_ignore_case", MustEqualsIgnoreCase)
+
+	type User struct {
+		Username string `validate:"required,field_equals_ignore_case=Email|field_equals_ignore_case=Phone"`
+		Email    string `validate:"required,email"`
+		Phone    string `validate:"required,numeric"`
+		Name     string `validate:"required"`
+	}
+
+	user := User{
+		Username: "test@example.com",
+		Email:    "test@example.com",
+		Phone:    "1212321",
+		Name:     "Budi",
+	}
+
+	err := validate.Struct(user)
+	if err != nil {
+		fmt.Println(err.Error())}
+}
