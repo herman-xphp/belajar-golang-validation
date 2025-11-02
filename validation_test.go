@@ -434,3 +434,22 @@ func TestCustomValidationParameter(t *testing.T) {
 		fmt.Println(err)
 	}
 }
+
+func TestOrRule(t *testing.T) {
+	validate := validator.New()
+
+	type Login struct {
+		Username string `validate:"required,email|number"`
+		Password string `validate:"required"`
+	}
+
+	request := Login{
+		Username: "aku@kamu.com",
+		Password: "1231",
+	}
+
+	err := validate.Struct(request)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+}
